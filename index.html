@@ -1,0 +1,259 @@
+Para una venta única de ropa (tipo feria americana o garage sale de prendas
+únicas), la mejor opción es WhatsApp con transferencia (Alias) por dos motivos
+clave:
+
+1.  Comisiones: Mercado Pago te cobra entre 3,5% y 6,5% + IVA por cada "Link de
+    Pago". Por transferencia directa (CBU / Alias de Mercado Pago) la comisión
+    es 0%.
+2.  Control de stock: Como cada prenda suele ser única (hay 1 sola unidad de
+    cada talle), si dos personas abren el link de Mercado Pago al mismo tiempo
+    pueden pagarte la misma prenda las dos. Por WhatsApp, tu amigo habla
+    directamente, le pasan el comprobante, y listo.
+
+A continuación tenés el código completo en un solo archivo (index.html). El
+diseño es minimalista, moderno (estilo streetwear/tienda minimal) y 100% pensado
+para celular, que es desde donde van a entrar desde Instagram.
+
+Código: index.html
+
+Creá un archivo llamado index.html y pegá exactamente esto:
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f7f7f8;
+      color: #111;
+      padding: 16px;
+    }
+
+    /* Grilla de productos */
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* Tarjeta individual */
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #e5e5e7;
+      transition: transform 0.15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Contenedor de la foto */
+    .img-container {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background-color: #eee;
+      position: relative;
+    }
+
+    .img-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Etiqueta de vendido */
+    .vendido-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Datos del producto */
+    .info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      gap: 6px;
+    }
+
+    .nombre {
+      font-size: 17px;
+      font-weight: 600;
+      color: #111;
+      line-height: 1.2;
+    }
+
+    .detalles {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .precio {
+      font-size: 18px;
+      font-weight: 700;
+      color: #000;
+      margin-top: 4px;
+    }
+
+    /* Botón de compra */
+    .btn-comprar {
+      margin-top: 10px;
+      display: block;
+      width: 100%;
+      text-align: center;
+      background-color: #111;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .btn-comprar:hover {
+      background-color: #333;
+    }
+
+    .btn-vendido {
+      background-color: #e5e5e7;
+      color: #888;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="catalogo" id="catalogo"></main>
+
+  <script>
+    // ==========================================
+    // 1. CONFIGURÁ EL NÚMERO DE TELÉFONO AQUÍ
+    // (Código de país + código de área + número, sin espacios ni símbolos)
+    // Ejemplo Argentina: 5491122334455
+    // ==========================================
+    const TELEFONO_WHATSAPP = "54911XXXXXXXX";
+
+    // ==========================================
+    // 2. LISTA DE PRENDAS
+    // Duplicá o editá cada bloque según lo que vendas.
+    // Podés poner vendido: true cuando se venda.
+    // ==========================================
+    const prendas = [
+      {
+        nombre: "Nike Air Force One",
+        talle: "42",
+        calce: "Calce fiel / Excelente estado",
+        precio: "$65.000",
+        foto: "fotos/nike-af1.jpg", // Guardá la foto con este nombre o usá un link
+        vendido: false
+      },
+      {
+        nombre: "Buzo Hoodie Oversize Negro",
+        talle: "L",
+        calce: "Calce holgado / Algodón rústico",
+        precio: "$32.000",
+        foto: "fotos/buzo-negro.jpg",
+        vendido: false
+      },
+      {
+        nombre: "Pantalón Cargo Beige",
+        talle: "M (40/42)",
+        calce: "Recto / 100% gabardina",
+        precio: "$28.000",
+        foto: "fotos/cargo-beige.jpg",
+        vendido: false
+      }
+    ];
+
+    // ==========================================
+    // RENDER AUTOMÁTICO (No tocar)
+    // ==========================================
+    const contenedor = document.getElementById("catalogo");
+
+    prendas.forEach(p => {
+      // Mensaje que le llega predeterminado a tu amigo:
+      const mensaje = encodeURIComponent(
+        `¡Hola! Quiero comprar: ${p.nombre} (Talle: ${p.talle}) por ${p.precio}. ¿Sigue disponible?`
+      );
+      const urlWs = `https://wa.me/${TELEFONO_WHATSAPP}?text=${mensaje}`;
+
+      const card = document.createElement("article");
+      card.className = "card";
+
+      card.innerHTML = `
+        <div class="img-container">
+          <img src="${p.foto}" alt="${p.nombre}" loading="lazy">
+          ${p.vendido ? '<span class="vendido-tag">Vendido</span>' : ''}
+        </div>
+        <div class="info">
+          <h2 class="nombre">${p.nombre}</h2>
+          <p class="detalles">Talle: <strong>${p.talle}</strong> · ${p.calce}</p>
+          <p class="precio">${p.precio}</p>
+          ${
+            p.vendido
+              ? '<span class="btn-comprar btn-vendido">No disponible</span>'
+              : `<a href="${urlWs}" target="_blank" class="btn-comprar">Comprar</a>`
+          }
+        </div>
+      `;
+
+      contenedor.appendChild(card);
+    });
+  </script>
+</body>
+</html>
+
+¿Cómo lo configurás y qué necesitás?
+
+Solo tenés que definir dos cosas dentro de ese archivo:
+
+1.  El teléfono: En la línea const TELEFONO_WHATSAPP = "54911XXXXXXXX"; poné el
+    número de tu amigo (con el 549 si es de Argentina).
+2.  Las fotos y prendas:
+      - Creá una carpeta llamada fotos al lado del index.html.
+      - Poné las fotos ahí (ej: nike-af1.jpg, buzo-negro.jpg).
+      - En la lista prendas del código, cambiás los nombres, talles, precios y
+        la ruta de la foto.
+      - Dato clave: Si vende algo durante el día, solo cambia vendido: false por
+        vendido: true, sube el cambio a GitHub y el botón se deshabilita
+        automáticamente.
+
+Cómo publicarlo en GitHub Pages en 2 minutos
+
+1.  Entrá a GitHub y creá un nuevo repositorio (por ejemplo, feria-ropa) y
+    marcalo como Público.
+2.  Subí el archivo index.html y la carpeta fotos.
+3.  Andá a Settings (Configuración) del repositorio > en el menú izquierdo
+    seleccioná Pages.
+4.  En Branch, seleccioná main (o master), dejá la carpeta / (root) y hacé clic
+    en Save.
+5.  Esperá 60 segundos y GitHub te va a dar el link (tipo
+    https://tuusuario.github.io/feria-ropa). Ese es el enlace que tu amigo pone
+    en su biografía o historias de Instagram.
